@@ -231,6 +231,11 @@ export default class MapVote extends DiscordBasePlugin {
                 required: false,
                 description: 'Array of timeframes to override options',
                 default: []
+            },
+            seedingLayer: {
+                required: false,
+                description: 'Layer used for seeding',
+                default: null
             }
         };
     }
@@ -567,7 +572,12 @@ export default class MapVote extends DiscordBasePlugin {
                 if (this.server.currentLayer) {
                     if (!this.server.currentLayer.gamemode.match(new RegExp(this.options.seedingGameMode, 'i'))) {
                         if (this.a2sPlayerCount <= this.options.instantSeedingModePlayerCount) {
-                            const newCurrentMap = rndMap.layerid;
+                            let newCurrentMap;
+                            if (this.options.seedingLayer == null || this.options.seedingLayer == "") {
+                             newCurrentMap = rndMap.layerid;
+                            } else {
+                                newCurrentMap = this.options.seedingLayer;
+                            }
                             this.verbose(1, 'Going into seeding mode.');
                             this.endVoting();
                             this.server.rcon.execute(`AdminChangeLayer ${newCurrentMap} `);
@@ -582,7 +592,12 @@ export default class MapVote extends DiscordBasePlugin {
                     while (rndMap2.layerid == rndMap.layerid)
 
                     if (this.a2sPlayerCount < this.options.nextLayerSeedingModePlayerCount && this.server.nextLayer.gamemode.toLowerCase() != "seed") {
-                        const newNextMap = rndMap2.layerid;
+                        let newNextMap;
+                        if (this.options.seedingLayer == null || this.options.seedingLayer == "") {
+                            newNextMap = rndMap2.layerid;
+                           } else {
+                            newNextMap = this.options.seedingLayer;
+                           }
                         this.endVoting();
                         this.server.rcon.execute(`AdminSetNextLayer ${newNextMap} `);
                     }
